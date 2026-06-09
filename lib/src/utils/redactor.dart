@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 const _sensitiveHeaderNames = {
   'authorization',
   'cookie',
@@ -50,6 +52,8 @@ String? serializeBody(Object? data, {required int maxLength}) {
     serialized = data;
   } else if (data is List<int>) {
     serialized = String.fromCharCodes(data);
+  } else if (data is Map || data is List) {
+    serialized = jsonEncode(data);
   } else {
     serialized = data.toString();
   }
