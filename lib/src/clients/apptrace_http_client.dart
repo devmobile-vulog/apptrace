@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../config/apptrace_config.dart';
 import '../models/network_log.dart';
 import '../services/log_dispatcher.dart';
+import '../utils/capture_metadata.dart';
 import '../utils/redactor.dart';
 
 /// Wraps an [http.Client] and captures outgoing traffic for AppTrace.
@@ -57,7 +58,7 @@ class AppTraceHttpClient extends http.BaseClient {
           durationMs: DateTime.now().difference(startedAt).inMilliseconds,
           appId: _config.appId,
           sessionId: _config.sessionId,
-          metadata: _config.metadata,
+          metadata: mergeCaptureMetadata(_config.metadata),
         ),
       );
 
@@ -88,7 +89,7 @@ class AppTraceHttpClient extends http.BaseClient {
           error: error.toString(),
           appId: _config.appId,
           sessionId: _config.sessionId,
-          metadata: _config.metadata,
+          metadata: mergeCaptureMetadata(_config.metadata),
         ),
       );
       rethrow;

@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../config/apptrace_config.dart';
 import '../models/network_log.dart';
 import '../services/log_dispatcher.dart';
+import '../utils/capture_metadata.dart';
 import '../utils/redactor.dart';
 
 /// Dio interceptor that captures HTTP traffic for AppTrace.
@@ -106,7 +107,7 @@ class AppTraceDioInterceptor extends Interceptor {
         error: error,
         appId: _config.appId,
         sessionId: _config.sessionId,
-        metadata: _config.metadata,
+        metadata: mergeCaptureMetadata(_config.metadata),
       ),
     );
   }
