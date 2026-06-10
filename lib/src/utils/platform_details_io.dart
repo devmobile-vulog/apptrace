@@ -4,7 +4,7 @@ import 'dart:io';
 Map<String, dynamic> capturePlatformDetails() {
   return {
     'os_version': Platform.operatingSystemVersion,
-    'device_label':
+    'os_label':
         '${Platform.operatingSystem} ${Platform.operatingSystemVersion}',
   };
 }

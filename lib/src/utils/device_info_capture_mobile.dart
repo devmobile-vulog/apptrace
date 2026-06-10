@@ -12,19 +12,36 @@ Future<Map<String, dynamic>> captureDeviceDetails() async {
     final brand = info.brand.trim();
     final model = info.model.trim();
     final device = info.device.trim();
-    final displayModel = model.isNotEmpty ? model : device;
+    final product = info.product.trim();
+    final displayModel = model.isNotEmpty
+        ? model
+        : product.isNotEmpty
+            ? product
+            : device;
+    final resolvedManufacturer = manufacturer.isNotEmpty
+        ? manufacturer
+        : brand.isNotEmpty
+            ? brand
+            : '';
     final label = [
-      if (manufacturer.isNotEmpty) manufacturer else brand,
+      if (resolvedManufacturer.isNotEmpty) resolvedManufacturer,
       displayModel,
     ].where((part) => part.isNotEmpty).join(' ');
+    final deviceId = [
+      resolvedManufacturer,
+      displayModel,
+      device,
+    ].where((part) => part.isNotEmpty).join('|').toLowerCase();
 
     return {
+      if (deviceId.isNotEmpty) 'device_id': deviceId,
       if (displayModel.isNotEmpty) 'device_model': displayModel,
-      if (manufacturer.isNotEmpty)
-        'device_manufacturer': manufacturer
-      else if (brand.isNotEmpty)
-        'device_manufacturer': brand,
-      if (label.isNotEmpty) 'device_name': label,
+      if (resolvedManufacturer.isNotEmpty)
+        'device_manufacturer': resolvedManufacturer,
+      if (label.isNotEmpty) ...{
+        'device_name': label,
+        'device_label': label,
+      },
       'os_version': info.version.release,
     };
   }
@@ -34,8 +51,13 @@ Future<Map<String, dynamic>> captureDeviceDetails() async {
     final machine = info.utsname.machine.trim();
     final userName = info.name.trim();
     final localizedModel = info.localizedModel.trim();
+    final vendorId = info.identifierForVendor?.trim();
 
     return {
+      if (vendorId != null && vendorId.isNotEmpty)
+        'device_id': vendorId
+      else if (machine.isNotEmpty)
+        'device_id': machine,
       if (machine.isNotEmpty) 'device_model': machine,
       if (localizedModel.isNotEmpty) 'device_label': localizedModel,
       if (userName.isNotEmpty) 'device_name': userName,
