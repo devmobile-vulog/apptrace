@@ -1,7 +1,20 @@
 import 'package:flutter/foundation.dart';
 
+import 'device_info_capture_stub.dart'
+    if (dart.library.io) 'device_info_capture_mobile.dart';
 import 'platform_details_stub.dart'
     if (dart.library.io) 'platform_details_io.dart';
+
+Map<String, dynamic> _cachedDeviceDetails = const {};
+
+/// Loads hardware metadata once during [AppTrace.initialize].
+Future<void> warmDeviceMetadata() async {
+  try {
+    _cachedDeviceDetails = await captureDeviceDetails();
+  } catch (_) {
+    _cachedDeviceDetails = const {};
+  }
+}
 
 /// Merges host [userMetadata] with automatic capture fields.
 ///
@@ -21,6 +34,10 @@ Map<String, dynamic> mergeCaptureMetadata(Map<String, dynamic> userMetadata) {
   }
 
   for (final entry in capturePlatformDetails().entries) {
+    merged.putIfAbsent(entry.key, () => entry.value);
+  }
+
+  for (final entry in _cachedDeviceDetails.entries) {
     merged.putIfAbsent(entry.key, () => entry.value);
   }
 

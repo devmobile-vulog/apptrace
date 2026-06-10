@@ -6,6 +6,7 @@ import 'interceptors/apptrace_dio_interceptor.dart';
 import 'services/log_dispatcher.dart';
 import 'setup/supabase_setup.dart';
 import 'sinks/supabase_log_sink.dart';
+import 'utils/capture_metadata.dart';
 
 /// Entry point for capturing app network traffic and sending it to Supabase.
 class AppTrace {
@@ -42,6 +43,8 @@ class AppTrace {
     if (verifySetup) {
       await verifySupabaseSetup(config);
     }
+
+    await warmDeviceMetadata();
 
     final existing = _instance;
     if (existing != null) {
